@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Tracker MVP</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Workout Tracker</h1>
+            <div class="stats-summary">
+                <div class="stat">
+                    <span class="stat-number" id="totalWorkouts">0</span>
+                    <span class="stat-label">Workouts</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="totalExercises">0</span>
+                    <span class="stat-label">Oefeningen</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="completionRate">0%</span>
+                    <span class="stat-label">Voltooid</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <section class="workout-section">
+                <h2>Workout Schema</h2>
+                <div class="day-selector">
+                    <button class="day-btn active" data-day="maandag">Maandag</button>
+                    <button class="day-btn" data-day="dinsdag">Dinsdag</button>
+                    <button class="day-btn" data-day="woensdag">Woensdag</button>
+                    <button class="day-btn" data-day="donderdag">Donderdag</button>
+                    <button class="day-btn" data-day="vrijdag">Vrijdag</button>
+                    <button class="day-btn" data-day="zaterdag">Zaterdag</button>
+                    <button class="day-btn" data-day="zondag">Zondag</button>
+                </div>
+                
+                <div class="current-day-exercises" id="currentDayExercises">
+                    <p class="no-exercises">Geen oefeningen voor deze dag. Voeg er hieronder een toe!</p>
+                </div>
+            </section>
+
+            <section class="add-exercise-section">
+                <h2>Oefening Toevoegen</h2>
+                <form id="addExerciseForm" class="exercise-form">
+                    <div class="form-group">
+                        <label for="exerciseName">Oefening Naam:</label>
+                        <input type="text" id="exerciseName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exerciseWeight">Gewicht (kg):</label>
+                        <input type="number" id="exerciseWeight" step="0.5" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exerciseSets">Aantal Sets:</label>
+                        <input type="number" id="exerciseSets" min="1" max="10" value="3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exerciseReps">Reps per Set:</label>
+                        <input type="number" id="exerciseReps" min="1" max="50" value="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exerciseDay">Dag:</label>
+                        <select id="exerciseDay" required>
+                            <option value="maandag">Maandag</option>
+                            <option value="dinsdag">Dinsdag</option>
+                            <option value="woensdag">Woensdag</option>
+                            <option value="donderdag">Donderdag</option>
+                            <option value="vrijdag">Vrijdag</option>
+                            <option value="zaterdag">Zaterdag</option>
+                            <option value="zondag">Zondag</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary">Oefening Toevoegen</button>
+                </form>
+            </section>
+
+            <section class="progress-section">
+                <h2>Voortgangsgrafiek</h2>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
