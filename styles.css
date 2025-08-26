@@ -1,0 +1,354 @@
+:root {
+    --primary-dark: #131f34;
+    --primary-gold: #8b6508;
+    --gold-light: #b8850a;
+    --text-light: #ffffff;
+    --text-secondary: #cccccc;
+    --background-light: #1a2742;
+    --background-card: #1e2d4a;
+    --border-color: #2a3b5c;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--primary-dark);
+    color: var(--text-light);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: var(--primary-gold);
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.stats-summary {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.stat {
+    background: var(--background-card);
+    padding: 15px 25px;
+    border-radius: 10px;
+    border: 2px solid var(--border-color);
+    text-align: center;
+    min-width: 120px;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-gold);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+section {
+    background: var(--background-card);
+    margin: 30px 0;
+    padding: 25px;
+    border-radius: 15px;
+    border: 2px solid var(--border-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+section h2 {
+    color: var(--primary-gold);
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--primary-gold);
+    padding-bottom: 10px;
+}
+
+.day-selector {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.day-btn {
+    background: var(--background-light);
+    color: var(--text-light);
+    border: 2px solid var(--border-color);
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.day-btn:hover {
+    background: var(--primary-gold);
+    color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.day-btn.active {
+    background: var(--primary-gold);
+    color: var(--primary-dark);
+    border-color: var(--primary-gold);
+}
+
+.current-day-exercises {
+    min-height: 200px;
+}
+
+.no-exercises {
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    padding: 50px 0;
+}
+
+.exercise-card {
+    background: var(--background-light);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.exercise-card:hover {
+    border-color: var(--primary-gold);
+    transform: translateY(-2px);
+}
+
+.exercise-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.exercise-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--primary-gold);
+}
+
+.exercise-weight {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.sets-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.set-button {
+    background: var(--background-light);
+    color: var(--text-light);
+    border: 2px solid var(--border-color);
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    text-align: center;
+}
+
+.set-button:hover {
+    border-color: var(--primary-gold);
+}
+
+.set-button.completed {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+.exercise-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-increase-weight {
+    background: var(--primary-gold);
+    color: var(--primary-dark);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-increase-weight:hover {
+    background: var(--gold-light);
+    transform: translateY(-1px);
+}
+
+.btn-increase-weight:disabled {
+    background: var(--text-secondary);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.exercise-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    align-items: end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    color: var(--primary-gold);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    background: var(--background-light);
+    color: var(--text-light);
+    border: 2px solid var(--border-color);
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-gold);
+}
+
+.btn-primary {
+    background: var(--primary-gold);
+    color: var(--primary-dark);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(139, 101, 8, 0.3);
+}
+
+.chart-container {
+    background: var(--background-light);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid var(--border-color);
+    height: 400px;
+    position: relative;
+}
+
+.chart-container canvas {
+    max-height: 100%;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .stats-summary {
+        gap: 15px;
+    }
+    
+    .day-selector {
+        justify-content: center;
+    }
+    
+    .day-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .exercise-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .exercise-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .sets-container {
+        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
