@@ -4,11 +4,14 @@ class WorkoutTracker {
         this.exercises = this.loadData('exercises') || {};
         this.workoutHistory = this.loadData('workoutHistory') || [];
         this.progressData = this.loadData('progressData') || {};
+        this.workoutSessions = this.loadData('workoutSessions') || [];
+        this.exerciseRecords = this.loadData('exerciseRecords') || {};
         
         this.initializeEventListeners();
         this.displayExercisesForDay(this.currentDay);
         this.updateStatistics();
         this.initializeProgressChart();
+        this.initializeModals();
     }
 
     // Data persistence methods
@@ -34,6 +37,47 @@ class WorkoutTracker {
         document.getElementById('addExerciseForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.addExercise();
+        });
+
+        // Progress and history buttons
+        document.getElementById('showProgressBtn').addEventListener('click', () => {
+            this.showProgressModal();
+        });
+
+        document.getElementById('showHistoryBtn').addEventListener('click', () => {
+            this.showHistoryModal();
+        });
+    }
+
+    // Initialize modal functionality
+    initializeModals() {
+        // Close modal functionality
+        document.querySelectorAll('.close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', (e) => {
+                const modal = e.target.closest('.modal');
+                modal.style.display = 'none';
+            });
+        });
+
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // History period filter
+        document.getElementById('historyPeriod').addEventListener('change', (e) => {
+            this.updateHistoryDisplay(e.target.value);
+        });
+
+        // Prevent modal content click from closing modal
+        document.querySelectorAll('.modal-content').forEach(content => {
+            content.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
         });
     }
 
@@ -188,9 +232,10 @@ class WorkoutTracker {
 
         exercise.completedSets[setIndex] = !exercise.completedSets[setIndex];
         
-        // If set was just completed, record workout activity
+        // If set was just completed, record detailed workout data
         if (exercise.completedSets[setIndex]) {
             this.recordWorkoutActivity(exercise, day);
+            this.recordExercisePerformance(exercise, setIndex, day);
         }
         
         this.saveData('exercises', this.exercises);
@@ -263,6 +308,53 @@ class WorkoutTracker {
         this.saveData('workoutHistory', this.workoutHistory);
     }
 
+    // Record exercise performance for detailed tracking
+    recordExercisePerformance(exercise, setIndex, day) {
+        const now = new Date();
+        const sessionId = `${now.toDateString()}_${day}`;
+        
+        // Find or create workout session
+        let session = this.workoutSessions.find(s => s.id === sessionId);
+        if (!session) {
+            session = {
+                id: sessionId,
+                date: now.toISOString(),
+                day: day,
+                exercises: {},
+                duration: 0,
+                totalSets: 0,
+                totalReps: 0
+            };
+            this.workoutSessions.push(session);
+        }
+
+        // Record exercise performance
+        if (!session.exercises[exercise.id]) {
+            session.exercises[exercise.id] = {
+                name: exercise.name,
+                weight: exercise.weight,
+                targetSets: exercise.sets,
+                targetReps: exercise.reps,
+                completedSets: [],
+                startTime: now.toISOString()
+            };
+        }
+
+        // Record the completed set
+        session.exercises[exercise.id].completedSets.push({
+            setNumber: setIndex + 1,
+            reps: exercise.reps,
+            weight: exercise.weight,
+            completedAt: now.toISOString()
+        });
+
+        // Update session totals
+        session.totalSets++;
+        session.totalReps += exercise.reps;
+
+        this.saveData('workoutSessions', this.workoutSessions);
+    }
+
     // Record progress data for charts
     recordProgressData(exercise) {
         const today = new Date().toDateString();
@@ -273,10 +365,35 @@ class WorkoutTracker {
         
         this.progressData[exercise.name].push({
             date: today,
-            weight: exercise.weight
+            weight: exercise.weight,
+            timestamp: new Date().toISOString()
         });
         
+        // Keep exercise records for comparison
+        if (!this.exerciseRecords[exercise.name]) {
+            this.exerciseRecords[exercise.name] = {
+                personalBest: exercise.weight,
+                firstWeight: exercise.weight,
+                totalWeightIncreases: 0,
+                history: []
+            };
+        }
+
+        const record = this.exerciseRecords[exercise.name];
+        record.history.push({
+            date: today,
+            weight: exercise.weight,
+            sets: exercise.sets,
+            reps: exercise.reps
+        });
+
+        if (exercise.weight > record.personalBest) {
+            record.personalBest = exercise.weight;
+        }
+        record.totalWeightIncreases++;
+
         this.saveData('progressData', this.progressData);
+        this.saveData('exerciseRecords', this.exerciseRecords);
     }
 
     // Update statistics display
@@ -390,6 +507,134 @@ class WorkoutTracker {
         this.chart.update();
     }
 
+    // Show progress modal
+    showProgressModal() {
+        document.getElementById('progressModal').style.display = 'block';
+        this.updateProgressChart();
+        this.updateProgressSummary();
+    }
+
+    // Show history modal
+    showHistoryModal() {
+        document.getElementById('historyModal').style.display = 'block';
+        this.updateHistoryDisplay('week');
+    }
+
+    // Update progress summary
+    updateProgressSummary() {
+        const summaryContainer = document.getElementById('progressSummary');
+        const records = this.exerciseRecords;
+        
+        if (Object.keys(records).length === 0) {
+            summaryContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Nog geen voortgangsdata beschikbaar. Begin met trainen!</p>';
+            return;
+        }
+
+        const totalExercises = Object.keys(records).length;
+        const totalWeightIncreases = Object.values(records).reduce((sum, record) => sum + record.totalWeightIncreases, 0);
+        const bestProgress = Object.entries(records).reduce((best, [name, record]) => {
+            const improvement = record.personalBest - record.firstWeight;
+            return improvement > best.improvement ? { name, improvement, weight: record.personalBest } : best;
+        }, { improvement: 0, name: '', weight: 0 });
+
+        summaryContainer.innerHTML = `
+            <h3>Voortgang Samenvatting</h3>
+            <div class="summary-stats">
+                <div class="summary-stat">
+                    <span class="summary-stat-number">${totalExercises}</span>
+                    <span class="summary-stat-label">Oefeningen Gevolgd</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="summary-stat-number">${totalWeightIncreases}</span>
+                    <span class="summary-stat-label">Gewichtsverhogingen</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="summary-stat-number">${bestProgress.improvement.toFixed(1)}kg</span>
+                    <span class="summary-stat-label">Beste Verbetering</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="summary-stat-number">${bestProgress.weight}kg</span>
+                    <span class="summary-stat-label">Hoogste Gewicht</span>
+                </div>
+            </div>
+            ${bestProgress.name ? `<p style="text-align: center; margin-top: 15px; color: var(--text-secondary);">
+                Beste voortgang: <strong style="color: var(--primary-gold);">${bestProgress.name}</strong>
+            </p>` : ''}
+        `;
+    }
+
+    // Update history display based on selected period
+    updateHistoryDisplay(period) {
+        const historyContainer = document.getElementById('historyContent');
+        const sessions = this.getFilteredSessions(period);
+
+        if (sessions.length === 0) {
+            historyContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Geen workout geschiedenis voor deze periode.</p>';
+            return;
+        }
+
+        historyContainer.innerHTML = sessions.map(session => this.createWorkoutEntryHTML(session)).join('');
+    }
+
+    // Get filtered workout sessions based on period
+    getFilteredSessions(period) {
+        const now = new Date();
+        let cutoffDate;
+
+        switch (period) {
+            case 'week':
+                cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                break;
+            case 'month':
+                cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                break;
+            case '3months':
+                cutoffDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+                break;
+            default:
+                cutoffDate = new Date(0);
+        }
+
+        return this.workoutSessions
+            .filter(session => new Date(session.date) >= cutoffDate)
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    // Create HTML for workout entry
+    createWorkoutEntryHTML(session) {
+        const date = new Date(session.date);
+        const dateStr = date.toLocaleDateString('nl-NL', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        const exerciseEntries = Object.values(session.exercises);
+        
+        return `
+            <div class="workout-entry">
+                <div class="workout-date">${dateStr}</div>
+                <div style="color: var(--text-secondary); margin-bottom: 15px;">
+                    ${session.totalSets} sets • ${session.totalReps} reps • ${exerciseEntries.length} oefeningen
+                </div>
+                <div class="workout-summary">
+                    ${exerciseEntries.map(exercise => `
+                        <div class="exercise-summary">
+                            <div class="exercise-summary-name">${exercise.name}</div>
+                            <div class="exercise-summary-details">
+                                ${exercise.weight}kg • ${exercise.completedSets.length}/${exercise.targetSets} sets • ${exercise.targetReps} reps
+                            </div>
+                            <div class="exercise-summary-details">
+                                Voltooid: ${exercise.completedSets.length === exercise.targetSets ? '✅' : '⏳'}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
     // Show notification
     showNotification(message, type = 'info') {
         // Create notification element
@@ -404,7 +649,7 @@ class WorkoutTracker {
             background: ${type === 'success' ? '#28a745' : type === 'warning' ? '#ffc107' : '#8b6508'};
             color: white;
             border-radius: 8px;
-            z-index: 1000;
+            z-index: 1001;
             animation: slideIn 0.3s ease-out;
         `;
         

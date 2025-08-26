@@ -81,12 +81,50 @@
             </section>
 
             <section class="progress-section">
-                <h2>Voortgangsgrafiek</h2>
-                <div class="chart-container">
-                    <canvas id="progressChart"></canvas>
+                <h2>Voortgang & Geschiedenis</h2>
+                <div class="progress-controls">
+                    <button id="showProgressBtn" class="btn-secondary">📊 Bekijk Voortgangsgrafiek</button>
+                    <button id="showHistoryBtn" class="btn-secondary">📋 Workout Geschiedenis</button>
                 </div>
             </section>
         </main>
+
+        <!-- Progress Chart Modal -->
+        <div id="progressModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Voortgangsgrafiek</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                    <div class="progress-summary" id="progressSummary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Modal -->
+        <div id="historyModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Workout Geschiedenis</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="history-filters">
+                        <select id="historyPeriod">
+                            <option value="week">Afgelopen Week</option>
+                            <option value="month">Afgelopen Maand</option>
+                            <option value="3months">Afgelopen 3 Maanden</option>
+                            <option value="all">Alle Tijd</option>
+                        </select>
+                    </div>
+                    <div id="historyContent" class="history-content"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
